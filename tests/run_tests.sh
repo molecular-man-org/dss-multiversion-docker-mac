@@ -198,18 +198,22 @@ done
 # ---------------------------------------------------------------- licences --
 section "licence expiry parsing"
 LICTMP=$(mktemp -d)
-cat > "$LICTMP/dev-x-2024.json" <<'JSON'
-{"content":{"expiresOn":20260929,"licenseKind":"EXAMPLE"}}
+# Relative to today: a fixed "not yet expired" date eventually expires and turns
+# a passing test into a failing one. Python, because date -d / date -v differ
+# between GNU and BSD.
+FUTURE=$(python3 -c "import datetime; print((datetime.date.today() + datetime.timedelta(days=3650)).strftime('%Y%m%d'))")
+cat > "$LICTMP/dev-x-2024.json" <<JSON
+{"content":{"expiresOn":$FUTURE,"licenseKind":"EXAMPLE"}}
 JSON
 cat > "$LICTMP/dev-x-2018.json" <<'JSON'
 {"content":{"expiresOn":20200101,"licenseKind":"EXAMPLE"}}
 JSON
-cat > "$LICTMP/dev-x-2025-enterprise.json" <<'JSON'
-{"content":{"expiresOn":20260929}}
+cat > "$LICTMP/dev-x-2025-enterprise.json" <<JSON
+{"content":{"expiresOn":$FUTURE}}
 JSON
-assert_eq "parses expiresOn" 20260929 "$(license_expiry "$LICTMP/dev-x-2024.json")"
-assert_false "2026 licence is not expired" license_expired "$LICTMP/dev-x-2024.json"
-assert_true  "2020 licence IS expired"     license_expired "$LICTMP/dev-x-2018.json"
+assert_eq "parses expiresOn" "$FUTURE" "$(license_expiry "$LICTMP/dev-x-2024.json")"
+assert_false "a future-dated licence is not expired" license_expired "$LICTMP/dev-x-2024.json"
+assert_true  "a 2020 licence IS expired"             license_expired "$LICTMP/dev-x-2018.json"
 
 section "licence preference order — 2024 first "
 # shellcheck disable=SC2034  # consumed by license_candidates in provision.sh
