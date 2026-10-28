@@ -30,3 +30,29 @@ Full reference: [docs/LICENCES.md](docs/LICENCES.md). The essentials:
 - Run at most two DSS nodes at once (the Docker VM's memory is the limit).
 - `bash tests/run_tests.sh` needs no Docker; `markdownlint .` and `shellcheck` run
   in the same gate.
+
+## Writing docs
+
+- Wrap prose at 80 columns as you write. Tables and code fences are exempt (see
+  `.markdownlint.yaml`). Run `markdownlint <file>` right after each doc write,
+  before the next command.
+
+## Shell and test gotchas
+
+- Scripts must run on macOS (bash 3.2, BSD userland) and on Linux (GNU, the CI
+  matrix). Avoid flags that exist on only one: `declare -A`, `sort -V`,
+  `pgrep -c`, `cat -A`, `tail -r`. `sed -i` needs `-i ''` on macOS.
+- In `tests/run_tests.sh`, call any sourced function that can `die` inside a
+  subshell `( … )`. `sh -c` loses sourced functions.
+- Wait for long jobs with a background `until <check>; do sleep 2; done`, never
+  a bare `sleep N`.
+
+## Probing a DSS API
+
+- Take field names and enum values from the SDK source
+  (`dataiku-api-client-python`) or the server's error text. After two guessed
+  variants, stop and write down what is known and unknown.
+- Every probe table carries a control that must return the opposite answer: a
+  path known to exist, a parent object known to exist. 400 means the route
+  exists. 403 can mean the parent project is missing. 404 on both eras is
+  probably a wrong path. None of these alone is evidence of absence.
