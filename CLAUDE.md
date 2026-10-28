@@ -30,6 +30,8 @@ Full reference: [docs/LICENCES.md](docs/LICENCES.md). The essentials:
 - Run at most two DSS nodes at once (the Docker VM's memory is the limit).
 - `bash tests/run_tests.sh` needs no Docker; `markdownlint .` and `shellcheck` run
   in the same gate.
+- Run `scripts/check.sh` before committing: tests, shellcheck and markdownlint in
+  one command, with a real exit code. CI should run the same command.
 
 ## Writing docs
 

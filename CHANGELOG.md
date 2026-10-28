@@ -6,6 +6,8 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- `scripts/check.sh` — the single gate (tests, shellcheck, markdownlint) for use
+  before committing and in CI.
 - **`snapshot`, `restore`, `upgrade`** — datadir snapshots and guarded upgrades.
   `upgrade <from> <to>` migrates a clone and leaves `from` untouched as the
   rollback. Verified live: a marker project survived 12.6.4 → 13.4.4 → 14.7.0.
