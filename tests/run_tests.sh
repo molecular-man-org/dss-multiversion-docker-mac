@@ -506,6 +506,9 @@ for f in "$ROOT"/tools/*.py; do
     if python3 -m py_compile "$f" 2>/dev/null; then ok
     else bad "tools: $(basename "$f") does not compile"; fi
 done
+# The sweep rewrites licences; its refusal of non-localhost nodes is load-bearing.
+if grep -q 'is_local(inst\["url"\])' "$ROOT/tools/licence_sweep.py"; then ok
+else bad "tools: licence_sweep.py lost its localhost-only guard"; fi
 
 # ---------------------------------------------------------------- lint gate --
 # Docs lint was bypassed three times because it lived in a shell one-liner whose

@@ -1,0 +1,65 @@
+{
+  "_about": "Measured 2026-09-11 on live dss-mac-docker nodes by applying each licence and reading GET /admin/licensing/status back. Reference only: at runtime the live node's base.userProfiles is authoritative. See docs/findings/licence-profiles-and-features.md.",
+  "admin_install_default_profile": "DATA_SCIENTIST",
+  "admin_install_default_observed_on": ["11.2.0", "12.6.7", "13.5.7", "14.7.3"],
+  "dss_versions_measured": ["11.2.0", "12.6.7", "13.5.7", "14.7.3"],
+  "licences": {
+    "SAER": {
+      "file_glob": "dev-*-2018.json",
+      "designer_profile": "DATA_SCIENTIST",
+      "admin_licensed_without_change": true,
+      "unusable_on": [],
+      "features_disabled": {
+        "11.2.0": [], "12.6.7": [], "13.5.7": [],
+        "14.7.3": ["businessAppsAllowed", "enterpriseProjectsAllowed", "projectStandardsAllowed"]
+      }
+    },
+    "enterprise-fy2023-1": {
+      "file_glob": "dev-*-2024.json",
+      "designer_profile": "DESIGNER",
+      "admin_licensed_without_change": false,
+      "unusable_on": [],
+      "features_disabled": {
+        "11.2.0": ["modelsJarExport", "modelsPMMLExport", "modelsRawSQLExport"],
+        "12.6.7": ["modelsJarExport", "modelsPMMLExport", "modelsRawSQLExport"],
+        "13.5.7": ["modelsJarExport", "modelsPMMLExport", "modelsRawSQLExport"],
+        "14.7.3": ["modelsJarExport", "modelsPMMLExport", "modelsRawSQLExport"]
+      }
+    },
+    "enterprise-ai-fy2025-1": {
+      "file_glob": "dev-*-2025-enterprise.json",
+      "designer_profile": "FULL_DESIGNER",
+      "admin_licensed_without_change": false,
+      "unusable_on": ["11.2.0"],
+      "features_disabled": {
+        "12.6.7": ["modelsJarExport", "modelsPMMLExport", "modelsRawSQLExport"],
+        "13.5.7": ["modelsJarExport", "modelsPMMLExport", "modelsRawSQLExport"],
+        "14.7.3": ["modelsJarExport", "modelsPMMLExport", "modelsRawSQLExport"]
+      }
+    },
+    "ai-ml-fy2025-1": {
+      "file_glob": "dev-*-2025-aiml.json",
+      "designer_profile": "FULL_DESIGNER",
+      "admin_licensed_without_change": false,
+      "unusable_on": ["11.2.0"],
+      "restricted_offer": true,
+      "features_disabled": {
+        "12.6.7": ["governBlueprintDesignerAllowed", "modelsJarExport", "modelsPMMLExport", "modelsRawSQLExport"],
+        "13.5.7": ["governBlueprintDesignerAllowed", "modelsJarExport", "modelsPMMLExport", "modelsRawSQLExport", "storiesAllowed"],
+        "14.7.3": ["businessAppsAllowed", "enterpriseProjectsAllowed", "governBlueprintDesignerAllowed", "modelsJarExport", "modelsPMMLExport", "modelsRawSQLExport", "projectStandardsAllowed", "storiesAllowed"]
+      }
+    },
+    "data-analytics-fy2025-1": {
+      "file_glob": "dev-*-2025-analytics.json",
+      "designer_profile": "FULL_DESIGNER",
+      "admin_licensed_without_change": false,
+      "unusable_on": ["11.2.0"],
+      "restricted_offer": true,
+      "features_disabled": {
+        "12.6.7": ["apiNodeAllowed", "governAllowed", "governBlueprintDesignerAllowed", "modelsExport", "modelsJarExport", "modelsPMMLExport", "modelsRawSQLExport"],
+        "13.5.7": ["advancedLLMMeshAllowed", "apiNodeAllowed", "governAllowed", "governBlueprintDesignerAllowed", "modelsExport", "modelsJarExport", "modelsPMMLExport", "modelsRawSQLExport", "storiesAllowed"],
+        "14.7.3": ["advancedLLMMeshAllowed", "apiNodeAllowed", "businessAppsAllowed", "enterpriseProjectsAllowed", "governAllowed", "governBlueprintDesignerAllowed", "modelsExport", "modelsJarExport", "modelsPMMLExport", "modelsRawSQLExport", "projectStandardsAllowed", "storiesAllowed"]
+      }
+    }
+  }
+}
