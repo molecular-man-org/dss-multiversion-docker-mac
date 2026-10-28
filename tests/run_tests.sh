@@ -17,6 +17,8 @@ NO_COLOR=1; export NO_COLOR
 . "$ROOT/bin/lib/instance.sh"
 # shellcheck source=../bin/lib/provision.sh
 . "$ROOT/bin/lib/provision.sh"
+# shellcheck source=../bin/lib/api.sh
+. "$ROOT/bin/lib/api.sh"
 # shellcheck source=../bin/lib/snapshot.sh
 . "$ROOT/bin/lib/snapshot.sh"
 # shellcheck source=../bin/lib/bundle.sh
@@ -509,6 +511,49 @@ done
 # The sweep rewrites licences; its refusal of non-localhost nodes is load-bearing.
 if grep -q 'is_local(inst\["url"\])' "$ROOT/tools/licence_sweep.py"; then ok
 else bad "tools: licence_sweep.py lost its localhost-only guard"; fi
+
+# ------------------------------------------------------------------- api --
+section "api_url_is_local accepts only a bare localhost URL"
+assert_true  "localhost with port"       api_url_is_local "http://localhost:11640"
+assert_true  "127.0.0.1 with port"       api_url_is_local "http://127.0.0.1:13730"
+assert_false "an internet node"          api_url_is_local "https://honker.example.com"
+assert_false "https localhost"           api_url_is_local "https://localhost:11640"
+assert_false "no port"                   api_url_is_local "http://localhost"
+assert_false "userinfo trick"            api_url_is_local "http://localhost:80@evil.example"
+assert_false "lookalike host"            api_url_is_local "http://localhost.evil.example:80"
+assert_false "path suffix"               api_url_is_local "http://localhost:80/x"
+
+section "api_call validates its arguments before touching anything"
+( api_call 12.6.4 FETCH /projects/ ) >/dev/null 2>&1; rc=$?
+if [ "$rc" -ne 0 ]; then ok; else bad "api_call accepted an invalid method"; fi
+( api_call 12.6.4 GET projects/ ) >/dev/null 2>&1; rc=$?
+if [ "$rc" -ne 0 ]; then ok; else bad "api_call accepted a path without a leading /"; fi
+
+section "api_call keeps the API key out of curl's argv"
+# argv is visible in `ps`; the key must reach curl only through stdin config.
+# Stubs replace the docker-backed lookups, and a shim curl records what it gets.
+SHIM=$(mktemp -d)
+cat > "$SHIM/curl" <<'SH'
+#!/bin/sh
+printf '%s\n' "$@" > "$SHIM/argv"
+cat > "$SHIM/stdin"
+SH
+chmod +x "$SHIM/curl"
+APIKEY_STUB="stubkey0123456789abcdef"
+( instance_url()        { printf 'http://localhost:9'; }
+  apikey_from_config()  { printf '%s' "$APIKEY_STUB"; }
+  # </dev/null: if the code under test stops piping the key, the shim must see
+  # EOF and fail the assertions below rather than hang the suite.
+  export SHIM; PATH="$SHIM:$PATH"
+  api_call 12.6.4 GET /admin/licensing/status </dev/null ) >/dev/null 2>&1
+# controls first: the shim must really have captured this call, and the key
+# must really have reached curl; otherwise "absent from argv" proves nothing.
+assert_true  "control: the shim captured the request URL" \
+    grep -q 'localhost:9/public/api/admin/licensing/status' "$SHIM/argv"
+assert_true  "control: the key reached curl via stdin config" \
+    grep -qF "$APIKEY_STUB" "$SHIM/stdin"
+assert_false "the key is NOT in curl's argv" grep -qF "$APIKEY_STUB" "$SHIM/argv"
+rm -rf "$SHIM"
 
 # ---------------------------------------------------------------- lint gate --
 # Docs lint was bypassed three times because it lived in a shell one-liner whose

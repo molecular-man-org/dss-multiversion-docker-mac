@@ -51,6 +51,9 @@ Full reference: [docs/LICENCES.md](docs/LICENCES.md). The essentials:
 
 ## Probing a DSS API
 
+- Use `dss-lab api <spec> <METHOD> <path> [json]` for calls to a local node. It
+  refuses non-local nodes, keeps the key out of `ps`, and always ends with an
+  `HTTP <code>` line, so a status is never mistaken for an empty result.
 - Take field names and enum values from the SDK source
   (`dataiku-api-client-python`) or the server's error text. After two guessed
   variants, stop and write down what is known and unknown.

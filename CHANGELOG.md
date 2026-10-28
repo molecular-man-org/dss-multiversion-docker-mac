@@ -6,6 +6,9 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- **`api`** — `dss-lab api <spec> <METHOD> <path> [json]`: authenticated calls
+  to a local node's public API. Refuses non-local nodes, passes the key through
+  curl's stdin config (never argv), and always ends with an `HTTP <code>` line.
 - `scripts/check.sh` — the single gate (tests, shellcheck, markdownlint) for use
   before committing and in CI.
 - **`snapshot`, `restore`, `upgrade`** — datadir snapshots and guarded upgrades.

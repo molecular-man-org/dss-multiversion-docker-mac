@@ -26,6 +26,8 @@ LIB_DIR="$(cd -P "$(dirname "$_self")/lib" && pwd)"
 . "$LIB_DIR/instance.sh"
 # shellcheck source=bin/lib/provision.sh
 . "$LIB_DIR/provision.sh"
+# shellcheck source=bin/lib/api.sh
+. "$LIB_DIR/api.sh"
 # shellcheck source=bin/lib/snapshot.sh
 . "$LIB_DIR/snapshot.sh"
 # shellcheck source=bin/lib/bundle.sh
@@ -79,6 +81,9 @@ PROVISIONING (for calling agents — see docs/PROVISIONING.md)
       --remap-connection OLD=NEW  Remap a connection (repeatable)
     license <spec> [FILE]       Apply a licence only
     apikey <spec>               Print the admin API key (minting if needed)
+    api <spec> <METHOD> <path> [json]  Authenticated call to a LOCAL node's public
+                                API. Refuses non-local nodes; always ends with an
+                                "HTTP <code>" line.
 
 SNAPSHOTS AND UPGRADES
     snapshot <spec> [name]      Copy the datadir (stops a running node, restarts it)
@@ -191,6 +196,7 @@ main() {
         provision) require_docker; local sp="$1"; shift; provision "$(catalog_resolve "$sp")" "$@" ;;
         license)  require_docker; local sp="$1"; shift; license_apply "$(catalog_resolve "$sp")" "${1:-}" >/dev/null ;;
         apikey)   require_docker; apikey_ensure "$(catalog_resolve "$1")" ;;
+        api)      require_docker; local sp="$1"; shift; api_call "$(catalog_resolve "$sp")" "$@" ;;
         bundle)   require_docker; local sp="$1"; shift; local f="${1:?bundle: need <spec> <file.zip>}"; shift; bundle_import "$(catalog_resolve "$sp")" "$f" "$@" ;;
         seed)     require_docker; local sp="$1"; shift; seed_instance "$(catalog_resolve "$sp")" "$@" ;;
         snapshot) require_docker; cmd_snapshot "$@" ;;
